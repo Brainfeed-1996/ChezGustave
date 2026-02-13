@@ -1,15 +1,46 @@
-name: CI
+name: Chez Gustave CI
 
 on:
-  - pull_request
-  - push
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - name: Run tests
-        run: |
-          docker compose -f docker-compose.test.yml up --build --exit-code-from server
-      
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install backend dependencies
+      run: |
+        cd server
+        npm install
+    
+    - name: Run backend tests
+      run: |
+        cd server
+        npm test
+    
+    - name: Install frontend dependencies
+      run: |
+        cd client
+        npm install
+    
+    - name: Run frontend tests
+      run: |
+        cd client
+        npm test
+    
+    - name: Lint
+      run: |
+        cd server
+        npm run lint
+        cd ../client
+        npm run lint
